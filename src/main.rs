@@ -1,25 +1,33 @@
 use {
     hyper::{
         service::{make_service_fn, service_fn},
-        Body, Client, Request, Response, Server, Uri,
+        Body, Request, Response, Server, StatusCode,
     },
     std::net::SocketAddr,
+    tokio::fs::File,
+    tokio_util::codec::{BytesCodec, FramedRead},
 };
 
-async fn serve_req(_req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    println!("Got request at {:?}", _req.uri());
+static NOTFOUND: &[u8] = b"Not Found";
 
-    // parse static url
-    let url_str = "http://www.rust-lang.org/";
-    let url = url_str.parse::<Uri>().expect("failed to parse URL");
+/// HTTP status code 404
+fn not_found() -> Response<Body> {
+    Response::builder()
+        .status(StatusCode::NOT_FOUND)
+        .body(NOTFOUND.into())
+        .unwrap()
+}
 
-    // get web site response
-    let res = Client::new().get(url).await?;
+async fn serve_req(_req: Request<Body>) -> anyhow::Result<Response<Body>> {
+    println!("Got headers at {:?}", _req.headers());
 
-    // Return the result of the request directly to the user
-    println!("request finished-- returning response");
+    if let Ok(file) = File::open("../tests/test.html").await {
+        let stream = FramedRead::new(file, BytesCodec::new());
+        let body = Body::wrap_stream(stream);
+        return Ok(Response::new(body));
+    }
 
-    Ok(res)
+    Ok(not_found())
 }
 
 async fn run_server(addr: SocketAddr) {
