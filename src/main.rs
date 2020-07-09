@@ -7,7 +7,8 @@ use {
 };
 
 async fn serve_req(_req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    // Always return successfully with a response.
+    println!("Got request at {:?}", _req.uri());
+
     Ok(Response::new(Body::from("hello, world")))
 }
 
