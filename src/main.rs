@@ -9,7 +9,17 @@ use {
 async fn serve_req(_req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     println!("Got request at {:?}", _req.uri());
 
-    Ok(Response::new(Body::from("hello, world")))
+    // parse static url
+    let url_str = "http://www.rust-lang.org/";
+    let url = url_str.parse::<Uri>().expect("failed to parse URL");
+
+    // get web site response
+    let res = Client::new().get(url).await?;
+
+    // Return the result of the request directly to the user
+    println!("request finished-- returning response");
+
+    Ok(res)
 }
 
 async fn run_server(addr: SocketAddr) {
