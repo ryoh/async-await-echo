@@ -1,14 +1,10 @@
 [package]
 name = "async-await-echo"
 version = "0.1.0"
-authors = ["Ryoh Kawai <kawairyoh@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hyper = "0.13"
-tokio = { version = "0.2", features = ["full"]}
-anyhow = "1.0"
-reqwest = { version = "0.10", features = ["blocking"]}
-tokio-util = "0.3"
+hyper = { version = "0.14", features = ["full"]}
+tokio = { version = "1", features = ["full"]}
